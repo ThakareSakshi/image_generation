@@ -1,23 +1,52 @@
 import logo from './logo.svg';
 import './App.css';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 
 function App() {
+
+  const [inputText,setInputText]=useState("");
+  const [imagelink,setImageLink]=useState("");
+  const API_TOKEN="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";
+
+  const fetchData=async()=>{
+    try{
+      const response =await axios.post(
+          'https://api-inference.huggingface.co/models/prompthero/openjourney-v4',
+          {
+            inputs: inputText,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${API_TOKEN}`,
+            },
+            responseType: 'blob', 
+          }
+        )
+        console.log(response.data);
+        const imageUrl = URL.createObjectURL(response.data);
+        console.log(imageUrl);
+        setImageLink(imageUrl);
+    
+    }
+    catch(e){
+      console.log("error aa gaya bhai fetch karte samay");
+    }
+  }
+
+
+  useEffect(()=>{
+    fetchData();
+  },[inputText])
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>image Generation Application</h1>
+     <input type="text"  value={inputText} onChange={(e)=>{
+      setInputText(e.target.value);
+
+     }}/>
+     <br/>
+     <img src={imagelink} alt=""/>
     </div>
   );
 }
